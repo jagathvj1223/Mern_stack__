@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- Canvas will be created dynamically by p5.js -->
+    </div>
+
+    <script>
+        let board = [ 
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ];
+
+        let players = ['X', 'O'];
+        let currentPlayer = 0; // Start with player 1
+        let available = 9; // Number of available spots
+
+        function setup() { 
+            createCanvas(400, 400);
+        }
+
+        function equals3(a, b, c) {
+            return a == b && b == c && a != '';
+        }
+
+        function checkWinner() {
+            let winner = null;
+
+            // Check horizontal, vertical, and diagonal lines
+            for (let i = 0; i < 3; i++) {
+                if (equals3(board[i][0], board[i][1], board[i][2])) {
+                    winner = board[i][0];
+                }
+                if (equals3(board[0][i], board[1][i], board[2][i])) {
+                    winner = board[0][i];
+                }
+            }
+            if (equals3(board[0][0], board[1][1], board[2][2])) {
+                winner = board[0][0];
+            }
+            if (equals3(board[2][0], board[1][1], board[0][2])) {
+                winner = board[2][0];
+            }
+
+            // Check for a tie
+            if (winner == null && available === 0) {
+                return 'tie';
+            } else {
+                return winner;
+            }
+        }
+
+        function mousePressed() {
+            let x = floor(mouseX / (width / 3));
+            let y = floor(mouseY / (height / 3));
+            if (board[x][y] === '') { // If spot is empty
+                board[x][y] = players[currentPlayer];
+                currentPlayer = (currentPlayer + 1) % 2; // Switch player
+                available--; // Decrease available spots
+            }
+        }
+
+        function draw() {
+            background(220);
+            let w = width / 3;
+            let h = height / 3;
+
+            line(w, 0, w, height);
+            line(w * 2, 0, w * 2, height);
+            line(0, h, width, h);
+            line(0, h * 2, width, h * 2);
+
+            for (let j = 0; j < 3; j++) {
+                for (let i = 0; i < 3; i++) {
+                    let x = w * i + w / 2;
+                    let y = h * j + h / 2;
+                    let spot = board[i][j];
+                    textSize(32);
+                    if (spot == players[1]) {
+                        noFill();
+                        ellipse(x, y, w / 2);
+                    } else if (spot == players[0]) {
+                        let xr = w / 5;
+                        line(x - xr, y - xr, x + xr, y + xr);
+                        line(x + xr, y - xr, x - xr, y + xr);
+                    }
+                }
+            }
+
+            let result = checkWinner();
+            if (result !== null) {
+                noLoop();
+                let resultP = createP('');
+                resultP.style('font-size', '32pt');
+                if (result === 'tie') {
+                    resultP.html('Tie!');
+                } else {
+                    resultP.html(`${result} wins!`);
+                }
+            }
+
+        }
+    </script>
+</body>
+</html>
